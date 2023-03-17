@@ -22,7 +22,7 @@ async function createUser({username, password, location, name}) {
         ON CONFLICT (username) DO NOTHING
         RETURNING *;
         `, [username, password, name, location]);
-        console.log(rows);
+        return rows;
     } catch (error) {
         console.log(error);
     }
@@ -53,7 +53,9 @@ async function createPost({authorId, title, content, tags = []}){
         
         const tagList = await createTags(tags);
 
-        return await addTagsToPost(post.id, tagList)
+        await addTagsToPost(post.id, tagList)
+
+        return getPostById(post.id)
     } catch (error) {
         console.log(error);
     }
@@ -139,15 +141,15 @@ async function getPostsByUser(userId) {
 
 async function getUserById(userId) {
     try {
-        const {rows} = await client.query(`
-        SELECT * FROM users
+        const {rows: [user]} = await client.query(`
+        SELECT id, username, name, location, active FROM users
         WHERE id = ${userId};
         `)
-        if(!rows.length) return null;
-        delete rows[0].password;
+        if(!user) return null;
+
         const posts = await getPostsByUser(userId);
-        rows.posts = posts
-        return rows;
+        user.posts = posts
+        return user;
     } catch (error) {
         console.log(error);
     }
@@ -256,4 +258,27 @@ async function getPostsByTagName(tagName) {
     }
 }
 
-module.exports ={client, getAllUsers, createUser, updateUser, createPost,updatePost, getAllPosts,getUserById, getPostsByUser, addTagsToPost, createTags, getPostsByTagName};
+async function getAllTags() {
+    try {
+        const {rows} = await client.query(`
+        SELECT * FROM tags;
+        `)
+        return rows;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function getUserByUsername(username){
+    try {
+        const {rows: [user]} = await client.query(`
+        SELECT * FROM users
+        WHERE username = $1;
+        `,[username])
+        return user;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+module.exports ={client, getAllUsers, createUser, updateUser, createPost,updatePost, getAllPosts,getUserById, getPostsByUser, addTagsToPost, createTags, getPostsByTagName, getAllTags, getUserByUsername};

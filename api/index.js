@@ -31,6 +31,7 @@ apiRouter.use(async (req, res, next) => {
   
         if (id) {
           req.user = await getUserById(id);
+          console.log(req.user)
           next();
         }
       } catch ({ name, message }) {
@@ -46,10 +47,12 @@ apiRouter.use(async (req, res, next) => {
 
 apiRouter.use((req, res, next) => {
     if (req.user) {
-      console.log("User is set:", req.user);
+      console.log("User is set:", req.user.id);
     }
     next();
 });
+
+
 
 apiRouter.use('/users', userRouter);
 
@@ -62,7 +65,8 @@ apiRouter.use((error, req, res, next) => {
       name: error.name,
       message: error.message
     });
-  });
+});
+
   
 
 module.exports = {
