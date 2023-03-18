@@ -1,7 +1,8 @@
 const {Client} = require("pg");
+require('dotenv').config();
 
-const client = new Client('postgres://juicebox_yriy_user:SdlZmJeNn942gacLf4qA7ocJgcqr7V97@dpg-cgb3nnhmbg55nqktpu5g-a.ohio-postgres.render.com/juicebox_yriy');
-client.password = "1025464";
+const client = new Client(process.env.DATABASE_URL);
+client.password = "SdlZmJeNn942gacLf4qA7ocJgcqr7V97";
 
 async function getAllUsers(){
     try {
