@@ -16,7 +16,7 @@ app.use(morgan('dev'));
 app.use('/api', apiRouter);
 
 client.connect();
-app.listen(3001, () =>{
+app.listen(5432, () =>{
     console.log("We are running on port 3001")
 });
 
